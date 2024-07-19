@@ -16,6 +16,9 @@ library(ggthemes)
 ## Loading Data
 
 
+```{r}
+data <- read_csv("")
+```
 
 
 
