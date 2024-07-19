@@ -17,7 +17,7 @@ library(ggthemes)
 
 
 ```{r}
-data <- read_csv("")
+new_data <- read_csv("")
 ```
 
 
