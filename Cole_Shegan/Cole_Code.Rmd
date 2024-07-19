@@ -1,0 +1,23 @@
+---
+title: "Cole_Code"
+output: html_document
+date: "2024-07-19"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(tidyverse)
+library(broom)
+library(ggthemes)
+
+```
+
+## Loading Data
+
+
+
+
+
+
+
