@@ -17,7 +17,12 @@ library(ggthemes)
 
 
 ```{r}
-new_data <- read_csv("")
+long_forwards <- long_forwards |> 
+  mutate(
+    EVG_first_4yrs = ((GP_2016 + GP_2017) * abs(`EVG/60_2016` - `EVG/60_2017`) + 
+           (GP_2017 + GP_2018) * abs(`EVG/60_2017` - `EVG/60_2018`) +
+           (GP_2018 + GP_2019) * abs(`EVG/60_2018` - `EVG/60_2019`)) / 
+           (GP_2016 + GP_2017) + (GP_2017 + GP_2018) + (GP_2018 + GP_2019))
 ```
 
 
