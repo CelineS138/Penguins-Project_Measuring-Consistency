@@ -533,12 +533,13 @@ long_forwards <- long_forwards |>
 
 long_forwards |> 
   ggplot(aes(mean_zscore, zscore_wmc, label = Player)) +
-  geom_point() +
+  geom_point(alpha = 0.7) +
   geom_vline(aes(xintercept = med_mean_zscore), linetype = "dashed", size = 1, color = "#FCB514") +
   geom_hline(aes(yintercept = med_zscore_wmc), linetype = "dashed", size = 1, color = "#FCB514") +
   geom_label_repel(size = 2, box.padding = 0.35) +
   theme_light() +
   labs(
+    title = "Combined Clustering of Good vs. Bad Players \nand Consistent vs. Inconsistent Players",
     x = "Combined Z-Scores of Metrics",
     y = "Consistency",
     caption = "Data Courtesy of Hockey-Reference"
@@ -567,11 +568,12 @@ long_forwards |>
 
 long_forwards |> 
   ggplot(aes(mean_EVG_zscore, EVG_wmc, label = Player)) +
-  geom_point() +
+  geom_point(alpha = 0.7) +
   geom_vline(aes(xintercept = med_EVG_zscore), linetype = "dashed", size = 1, color = "#FCB514") +
   geom_hline(aes(yintercept = med_EVG_wmc), linetype = "dashed", size = 1, color = "#FCB514") +
   geom_label_repel(size = 2, box.padding = 0.25) + 
   labs(
+    title = "EVG Clustering of Good vs. Bad Players \nand Consistent and Inconsistent Players",
     x = "Mean Z-Score of Goals per 60 at EV ",
     y = "Consistency",
     caption = "Data Courtsey of Hockey-Reference"
@@ -583,11 +585,12 @@ long_forwards |>
 
 long_forwards |> 
   ggplot(aes(mean_EVA_zscore, EVA_wmc, label = Player)) +
-  geom_point() +
+  geom_point(alpha = 0.7) +
   geom_vline(aes(xintercept = med_EVA_zscore), linetype = "dashed", size = 1, color = "#FCB514") +
   geom_hline(aes(yintercept = med_EVA_wmc), linetype = "dasehd", size = 1, color = "#FCB514") +
   geom_label_repel(size = 2, box.padding = 0.35) +
   labs(
+    title = "EVA Clustering of Good vs. Bad Players \nand Consistent and Inconsistent Players",
     x = "Mean Z-Score of Assists per 60 at EV",
     y = "Consistency",
     caption = "Data Courtesy of Hockey-Reference"
@@ -600,16 +603,17 @@ long_forwards |>
 
 long_forwards |> 
   ggplot(aes(`mean_S%_zscore`, `S%_wmc`, label = Player)) +
-  geom_point() +
+  geom_point(alpha = 0.7) +
   geom_vline(aes(xintercept = `med_S%_zscore`), linetype = "dashed", size = 1, color = "#FCB514") +
   geom_hline(aes(yintercept = `med_S%_wmc`), linetype = "dashed", size = 1, color = "#FCB514") +
   geom_label_repel(size = 2, box.padding = 0.25) +
-  theme_light() +
   labs(
+    title = "S% Clustering of Good vs. Bad Players \nand Consistent and Inconsistent Players",
     x = "Mean Z-Score of Shooting Percentage at EV",
     y = "Consistency",
     caption = "Data Courtesy of Hockey-Reference"
-  )
+  ) +
+  theme_light()
 ```
 
 
@@ -620,7 +624,9 @@ long_forwards |>
   na.omit() |> 
   filter(total_zscore >= quantile(total_zscore, 0.85)) |> 
   select(Player, mean_zscore, zscore_wmc) |> 
-  arrange(zscore_wmc)
+  rename(Mean_Total_zscore = mean_zscore, 
+         Weighted_Means_Change = zscore_wmc) |> 
+  arrange(Weighted_Means_Change)
 ```
 
 
