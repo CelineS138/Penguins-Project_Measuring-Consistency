@@ -9,11 +9,198 @@ knitr::opts_chunk$set(echo = TRUE)
 
 library(tidyverse)
 library(broom)
+library(ggplot2)
+library(ggcorrplot)
+library(dplyr)
+library(tidyr)
 library(ggthemes)
+
+library(ggbeeswarm)
+library(ggrepel)
 
 ```
 
 ## Loading Data
+
+
+
+```{r}
+basic_2023_24 <- read_csv("~/CMU Summer Research/Capstone Project/Data_Copy/Basic Stats/basic_stats_23_24.csv") |> 
+  rename(EVG = EV...13, PPG = PP...14, SHG = SH...15, EVA = EV...17, PPA = PP...18, SHA = SH...19) |> mutate(start_year = 2023)
+
+basic_2022_23 <- read_csv("~/CMU Summer Research/Capstone Project/Data_Copy/Basic Stats/basic_stats_22_23.csv") |> 
+  rename(EVG = EV...13, PPG = PP...14, SHG = SH...15, EVA = EV...17, PPA = PP...18, SHA = SH...19) |> mutate(start_year = 2022)
+
+basic_2021_22 <- read_csv("~/CMU Summer Research/Capstone Project/Data_Copy/Basic Stats/basic_stats_21_22.csv") |> 
+  rename(EVG = EV...13, PPG = PP...14, SHG = SH...15, EVA = EV...17, PPA = PP...18, SHA = SH...19) |> mutate(start_year = 2021)
+
+basic_2020_21 <- read_csv("~/CMU Summer Research/Capstone Project/Data_Copy/Basic Stats/basic_stats_20_21.csv") |> 
+  rename(EVG = EV...13, PPG = PP...14, SHG = SH...15, EVA = EV...17, PPA = PP...18, SHA = SH...19) |> mutate(start_year = 2020)
+
+basic_2019_20 <- read_csv("~/CMU Summer Research/Capstone Project/Data_Copy/Basic Stats/basic_stats_19_20.csv") |> 
+  rename(EVG = EV...13, PPG = PP...14, SHG = SH...15, EVA = EV...17, PPA = PP...18, SHA = SH...19) |> mutate(start_year = 2019)
+
+basic_2018_19 <- read_csv("~/CMU Summer Research/Capstone Project/Data_Copy/Basic Stats/basic_stats_18_19.csv") |> 
+  rename(EVG = EV...13, PPG = PP...14, SHG = SH...15, EVA = EV...17, PPA = PP...18, SHA = SH...19) |> mutate(start_year = 2018)
+
+basic_2017_18 <- read_csv("~/CMU Summer Research/Capstone Project/Data_Copy/Basic Stats/basic_stats_17_18.csv") |> 
+  rename(EVG = EV...13, PPG = PP...14, SHG = SH...15, EVA = EV...17, PPA = PP...18, SHA = SH...19) |> mutate(start_year = 2017)
+
+basic_2016_17 <- read_csv("~/CMU Summer Research/Capstone Project/Data_Copy/Basic Stats/basic_stats_16_17.csv") |> 
+  rename(EVG = EV...13, PPG = PP...14, SHG = SH...15, EVA = EV...17, PPA = PP...18, SHA = SH...19) |> mutate(start_year = 2016)
+
+basic_df <- rbind(basic_2016_17, basic_2017_18, basic_2018_19, basic_2019_20, basic_2020_21, basic_2021_22, basic_2022_23, basic_2023_24)
+
+basic_df <- basic_df |> 
+  filter(Pos != "G", GP >= 20)
+```
+
+
+
+
+```{r}
+advanced_2023_24 <- read_csv("~/CMU Summer Research/Capstone Project/Data_Copy/Advanced Stats/advanced_stats_23_24.csv") |> 
+  mutate(start_year = 2023)
+
+advanced_2022_23 <- read_csv("~/CMU Summer Research/Capstone Project/Data_Copy/Advanced Stats/advanced_stats_22_23.csv") |> 
+  mutate(start_year = 2022)
+
+advanced_2021_22 <- read_csv("~/CMU Summer Research/Capstone Project/Data_Copy/Advanced Stats/advanced_stats_21_22.csv") |> 
+  mutate(start_year = 2021)
+
+advanced_2020_21 <- read_csv("~/CMU Summer Research/Capstone Project/Data_Copy/Advanced Stats/advanced_stats_20_21.csv") |> 
+  mutate(start_year = 2020)
+
+advanced_2019_20 <- read_csv("~/CMU Summer Research/Capstone Project/Data_Copy/Advanced Stats/advanced_stats_19_20.csv") |> 
+  mutate(start_year = 2019)
+
+advanced_2018_19 <- read_csv("~/CMU Summer Research/Capstone Project/Data_Copy/Advanced Stats/advanced_stats_18_19.csv") |> 
+  mutate(start_year = 2018)
+
+advanced_2017_18 <- read_csv("~/CMU Summer Research/Capstone Project/Data_Copy/Advanced Stats/advanced_stats_17_18.csv") |>
+  mutate(start_year = 2017)
+
+advanced_2016_17 <- read_csv("~/CMU Summer Research/Capstone Project/Data_Copy/Advanced Stats/advanced_stats_16_17.csv") |>
+  mutate(start_year = 2016)
+
+advanced_df <- rbind(advanced_2016_17, advanced_2017_18, advanced_2018_19, advanced_2019_20, advanced_2020_21, advanced_2021_22, advanced_2022_23, advanced_2023_24)
+
+advanced_df <- advanced_df |> filter(GP >= 20, Pos != "G") |> unique()
+```
+
+
+
+
+```{r}
+toi_2023_24 <- read_csv("~/CMU Summer Research/Capstone Project/Data_Copy/TOI Stats/toi_stats_23_24.csv") |> 
+  mutate(start_year = 2023)
+
+toi_2022_23 <- read_csv("~/CMU Summer Research/Capstone Project/Data_Copy/TOI Stats/toi_stats_22_23.csv") |>
+  mutate(start_year = 2022)
+
+toi_2021_22 <- read_csv("~/CMU Summer Research/Capstone Project/Data_Copy/TOI Stats/toi_stats_21_22.csv") |> 
+  mutate(start_year = 2021)
+
+toi_2020_21 <- read_csv("~/CMU Summer Research/Capstone Project/Data_Copy/TOI Stats/toi_stats_20_21.csv") |> 
+  mutate(start_year = 2020)
+
+toi_2019_20 <- read_csv("~/CMU Summer Research/Capstone Project/Data_Copy/TOI Stats/toi_stats_19_20.csv") |> 
+  mutate(start_year = 2019)
+
+toi_2018_19 <- read_csv("~/CMU Summer Research/Capstone Project/Data_Copy/TOI Stats/toi_stats_18_19.csv") |> 
+  mutate(start_year = 2018)
+
+toi_2017_18 <- read_csv("~/CMU Summer Research/Capstone Project/Data_Copy/TOI Stats/toi_stats_17_18.csv") |> 
+  mutate(start_year = 2017)
+
+toi_2016_17 <- read_csv("~/CMU Summer Research/Capstone Project/Data_Copy/TOI Stats/toi_stats_16_17.csv") |> 
+  mutate(start_year = 2016)
+
+toi_df <- rbind(toi_2016_17, toi_2017_18, toi_2018_19, toi_2019_20, toi_2020_21, toi_2021_22, toi_2022_23, toi_2023_24)
+
+toi_df <- toi_df |> select(-`...7`, -`...12`, -`...17`)
+
+toi_df <- toi_df |> filter(Pos != "G", GP >= 20, PlayerID != "ahose02")
+```
+
+
+
+
+```{r}
+misc_2023_24 <- read_csv("~/CMU Summer Research/Capstone Project/Data_Copy/Misc Stats/misc_stats_23_24.csv") |> 
+  mutate(start_year = 2023)
+
+misc_2022_23 <- read_csv("~/CMU Summer Research/Capstone Project/Data_Copy/Misc Stats/misc_stats_22_23.csv") |>
+  mutate(start_year = 2022)
+
+misc_2021_22 <- read_csv("~/CMU Summer Research/Capstone Project/Data_Copy/Misc Stats/misc_stats_21_22.csv") |> 
+  mutate(start_year = 2021)
+
+misc_2020_21 <- read_csv("~/CMU Summer Research/Capstone Project/Data_Copy/Misc Stats/misc_stats_20_21.csv") |> 
+  mutate(start_year = 2020)
+
+misc_2019_20 <- read_csv("~/CMU Summer Research/Capstone Project/Data_Copy/Misc Stats/misc_stats_19_20.csv") |> 
+  mutate(start_year = 2019)
+
+misc_2018_19 <- read_csv("~/CMU Summer Research/Capstone Project/Data_Copy/Misc Stats/misc_stats_18_19.csv") |> 
+  mutate(start_year = 2018)
+
+misc_2017_18 <- read_csv("~/CMU Summer Research/Capstone Project/Data_Copy/Misc Stats/misc_stats_17_18.csv") |> 
+  mutate(start_year = 2017)
+
+misc_2016_17 <- read_csv("~/CMU Summer Research/Capstone Project/Data_Copy/Misc Stats/misc_stats_16_17.csv") |> 
+  mutate(start_year = 2016)
+
+misc_df <- rbind(misc_2016_17, misc_2017_18, misc_2018_19, misc_2019_20, misc_2020_21, misc_2021_22, misc_2022_23, misc_2023_24)
+
+misc_df <- misc_df |> filter(Pos != "G", GP >= 20)
+```
+
+
+
+
+```{r}
+misc_df_pos <- misc_df |> 
+  mutate(Pos = str_extract(Pos, "[A-Z]"))
+
+num_seasons <- misc_df |> 
+  group_by(Player, PlayerID) |> 
+  count() |> 
+  ungroup() |> 
+  mutate(num_seasons = n) |> 
+  unique()
+
+player_pos <- misc_df_pos |> 
+  group_by(Player, PlayerID) |> 
+  summarise(Pos = ifelse(Pos %in% c("C", "L", "R", "W", "F"), "F", "D")) |> 
+  unique()
+```
+
+
+
+
+```{r}
+complete_df1 <- cbind(basic_df, advanced_df, toi_df, misc_df)
+
+complete_df <- complete_df1[ , !duplicated(colnames(complete_df1))]
+
+complete_df <- complete_df |> filter(Player != "Daniel Sedin", Player != "Henrik Sedin", Player != "Jarome Iginla", Player != "Marián Hossa")
+
+complete_df <- complete_df |> 
+  mutate(Pos = str_extract(Pos, "[A-Z]")) |> 
+  group_by(Player, PlayerID) |> 
+  mutate(Pos = ifelse(Pos %in% c("C", "L", "R", "W", "F"), "F", "D")) |> 
+  unique()
+
+complete_df <- complete_df |> full_join(num_seasons) |> select(-n)
+
+complete_df <- complete_df |> 
+  filter(num_seasons >= 5)
+```
+
+
+
+
 
 
 
@@ -96,45 +283,288 @@ long_forwards <- long_skaters |>
 
 
 
-long_forwards <- long_forwards |> 
-  mutate(
-    EVG_first_4yrs = ((GP_2016 + GP_2017) * abs(`EVG/60_2016` - `EVG/60_2017`) + 
-           (GP_2017 + GP_2018) * abs(`EVG/60_2017` - `EVG/60_2018`) +
-           (GP_2018 + GP_2019) * abs(`EVG/60_2018` - `EVG/60_2019`)) / 
-           (GP_2016 + GP_2017) + (GP_2017 + GP_2018) + (GP_2018 + GP_2019),
-    
-    EVG_last_4yrs = ((GP_2020 + GP_2021) * (`EVG/60_2020` - `EVG/60_2021`) + 
-           (GP_2021 + GP_2022) * (`EVG/60_2021` - `EVG/60_2022`) +
-           (GP_2022 + GP_2023) * (`EVG/60_2022` - `EVG/60_2023`)) / 
-           (GP_2020 + GP_2021) + (GP_2021 + GP_2022) + (GP_2022 + GP_2023),
-    
-    EVA_first_4yrs = ((GP_2016 + GP_2017) * (`EVA/60_2016` - `EVA/60_2017`) + 
-           (GP_2017 + GP_2018) * (`EVA/60_2017` - `EVA/60_2018`) +
-           (GP_2018 + GP_2019) * (`EVA/60_2018` - `EVA/60_2019`)) / 
-           (GP_2016 + GP_2017) + (GP_2017 + GP_2018) + (GP_2018 + GP_2019),
-    
-    EVA_last_4yrs = ((GP_2020 + GP_2021) * (`EVA/60_2020` - `EVA/60_2021`) + 
-           (GP_2021 + GP_2022) * (`EVA/60_2021` - `EVA/60_2022`) +
-           (GP_2022 + GP_2023) * (`EVA/60_2022` - `EVA/60_2023`)) / 
-           (GP_2020 + GP_2021) + (GP_2021 + GP_2022) + (GP_2022 + GP_2023)
-    )
+# long_forwards <- long_forwards |> 
+#   mutate(
+#     EVG_first_4yrs = ((GP_2016 + GP_2017) * abs(`EVG/60_2016` - `EVG/60_2017`) + 
+#            (GP_2017 + GP_2018) * abs(`EVG/60_2017` - `EVG/60_2018`) +
+#            (GP_2018 + GP_2019) * abs(`EVG/60_2018` - `EVG/60_2019`)) / 
+#            (GP_2016 + GP_2017) + (GP_2017 + GP_2018) + (GP_2018 + GP_2019),
+#     
+#     EVG_last_4yrs = ((GP_2020 + GP_2021) * (`EVG/60_2020` - `EVG/60_2021`) + 
+#            (GP_2021 + GP_2022) * (`EVG/60_2021` - `EVG/60_2022`) +
+#            (GP_2022 + GP_2023) * (`EVG/60_2022` - `EVG/60_2023`)) / 
+#            (GP_2020 + GP_2021) + (GP_2021 + GP_2022) + (GP_2022 + GP_2023),
+#     
+#     EVA_first_4yrs = ((GP_2016 + GP_2017) * (`EVA/60_2016` - `EVA/60_2017`) + 
+#            (GP_2017 + GP_2018) * (`EVA/60_2017` - `EVA/60_2018`) +
+#            (GP_2018 + GP_2019) * (`EVA/60_2018` - `EVA/60_2019`)) / 
+#            (GP_2016 + GP_2017) + (GP_2017 + GP_2018) + (GP_2018 + GP_2019),
+#     
+#     EVA_last_4yrs = ((GP_2020 + GP_2021) * (`EVA/60_2020` - `EVA/60_2021`) + 
+#            (GP_2021 + GP_2022) * (`EVA/60_2021` - `EVA/60_2022`) +
+#            (GP_2022 + GP_2023) * (`EVA/60_2022` - `EVA/60_2023`)) / 
+#            (GP_2020 + GP_2021) + (GP_2021 + GP_2022) + (GP_2022 + GP_2023)
+#     )
 
 ```
 
+
+
+
+```{r}
+feat <- skaters |> 
+  ungroup() |> 
+  filter(Pos == "F") |> 
+  select(EVA_zscore, EVG_zscore, `S%_zscore`) |> na.omit()
+
+nhl_pca <- princomp(feat)
+
+# summary(nhl_pca)
+
+
+# Assuming nhl_pca2$loadings is your loadings matrix
+
+# Get the loadings matrix
+loadings <- nhl_pca$loadings
+
+# Function to normalize loadings
+normalize_loadings <- function(loadings) {
+  # Calculate the sum of the absolute values of the loadings for each component
+  col_sums <- colSums(abs(loadings), na.rm = TRUE)
+  
+  # Divide each loading by the sum of the absolute values of its component
+  normalized_loadings <- sweep(loadings, 2, col_sums, FUN = "/")
+  
+  return(normalized_loadings)
+}
+
+# Normalize the loadings
+normalized_loadings <- normalize_loadings(loadings)
+
+print(normalized_loadings)
+```
 
 
 
 
 
 ```{r}
-long_forwards <- long_forwards |> 
-  mutate(
-    EVG_first_4yrs = ((GP_2016 + GP_2017) * abs(`EVG/60_2016` - `EVG/60_2017`) + 
-           (GP_2017 + GP_2018) * abs(`EVG/60_2017` - `EVG/60_2018`) +
-           (GP_2018 + GP_2019) * abs(`EVG/60_2018` - `EVG/60_2019`)) / 
-           (GP_2016 + GP_2017) + (GP_2017 + GP_2018) + (GP_2018 + GP_2019))
+forwards <- skaters |> 
+  filter(Pos == "F") |> 
+  group_by(Player, start_year) |> 
+  mutate(total_zscore = sum(normalized_loadings[1, 1] * EVA_zscore, normalized_loadings[2, 1] * EVG_zscore, normalized_loadings[3, 1] * `S%_zscore`)) |> 
+  ungroup() |> 
+  group_by(Player) |> 
+  mutate(mean_zscore = mean(total_zscore, na.rm = TRUE),
+         mean_EVG_zscore = mean(EVG_zscore, na.rm = TRUE),
+         mean_EVA_zscore = mean(EVA_zscore, na.rm = TRUE),
+         `mean_S%_zscore` = mean(`S%_zscore`, na.rm = TRUE))
+
+
+
+forwards |> 
+  ggplot(aes(as.factor(start_year), total_zscore, label = Player)) +
+  geom_violin() + 
+  geom_label_repel(size = 2, box.padding = 0.3) +
+  labs(
+    x = "Season Starting Year",
+    y = "Combined Z-Score Measuring Offensive Ability",
+    caption = "Data Courtesy of Hockey-Reference"
+  ) + 
+  theme_light()
 ```
 
+
+
+
+```{r}
+long_forwards <- forwards |> 
+  ungroup() |> 
+  pivot_wider(id_cols = c(Player, PlayerID), values_from = c(`GP`, `EVG/60`, `EVA/60`, `EVPTS/60`, `GC/60`, `S%`, EVG_zscore, EVA_zscore, EVPTS_zscore, GC_zscore, `S%_zscore`, mean_zscore, mean_EVG_zscore, mean_EVA_zscore, `mean_S%_zscore`, total_zscore), names_from = start_year)
+
+
+# long_forwards <- long_skaters |> 
+#   left_join(player_pos) |> 
+#   filter(Pos == "F")
+
+long_forwards <- long_forwards |> 
+  mutate(GP_2019 = round((GP_2019 / 71) * 82),
+         GP_2020 = round((GP_2020 / 56) * 82))
+```
+
+
+
+
+```{r}
+long_forwards <- long_forwards |>
+  mutate(
+    EVG_wmc = (
+      if_else(!is.na(GP_2016) & !is.na(GP_2017) & !is.na(`EVG/60_2016`) & !is.na(`EVG/60_2017`), (GP_2016 + GP_2017) * abs(`EVG/60_2016` - `EVG/60_2017`), 0) +
+        if_else(!is.na(GP_2017) & !is.na(GP_2018) & !is.na(`EVG/60_2017`) & !is.na(`EVG/60_2018`), (GP_2017 + GP_2018) * abs(`EVG/60_2017` - `EVG/60_2018`), 0) +
+        if_else(!is.na(GP_2018) & !is.na(GP_2019) & !is.na(`EVG/60_2018`) & !is.na(`EVG/60_2019`), (GP_2018 + GP_2019) * abs(`EVG/60_2018` - `EVG/60_2019`), 0) +
+        if_else(!is.na(GP_2019) & !is.na(GP_2020) & !is.na(`EVG/60_2019`) & !is.na(`EVG/60_2020`), (GP_2019 + GP_2020) * abs(`EVG/60_2019` - `EVG/60_2020`), 0) +
+        if_else(!is.na(GP_2020) & !is.na(GP_2021) & !is.na(`EVG/60_2020`) & !is.na(`EVG/60_2021`), (GP_2020 + GP_2021) * abs(`EVG/60_2020` - `EVG/60_2021`), 0) +
+        if_else(!is.na(GP_2021) & !is.na(GP_2022) & !is.na(`EVG/60_2021`) & !is.na(`EVG/60_2022`), (GP_2021 + GP_2022) * abs(`EVG/60_2021` - `EVG/60_2022`), 0) +
+        if_else(!is.na(GP_2022) & !is.na(GP_2023) & !is.na(`EVG/60_2022`) & !is.na(`EVG/60_2023`), (GP_2022 + GP_2023) * abs(`EVG/60_2022` - `EVG/60_2023`), 0)
+    ) / 
+      (
+        sum(if_else(!is.na(GP_2016) & !is.na(GP_2017), GP_2016 + GP_2017, 0), 
+            if_else(!is.na(GP_2017) & !is.na(GP_2018), GP_2017 + GP_2018, 0), 
+            if_else(!is.na(GP_2018) & !is.na(GP_2019), GP_2018 + GP_2019, 0), 
+            if_else(!is.na(GP_2019) & !is.na(GP_2020), GP_2019 + GP_2020, 0), 
+            if_else(!is.na(GP_2020) & !is.na(GP_2021), GP_2020 + GP_2021, 0), 
+            if_else(!is.na(GP_2021) & !is.na(GP_2022), GP_2021 + GP_2022, 0), 
+            if_else(!is.na(GP_2022) & !is.na(GP_2023), GP_2022 + GP_2023, 0))
+      ),
+    
+    EVA_wmc = (
+      if_else(!is.na(GP_2016) & !is.na(GP_2017) & !is.na(`EVA/60_2016`) & !is.na(`EVA/60_2017`), (GP_2016 + GP_2017) * abs(`EVA/60_2016` - `EVA/60_2017`), 0) +
+        if_else(!is.na(GP_2017) & !is.na(GP_2018) & !is.na(`EVA/60_2017`) & !is.na(`EVA/60_2018`), (GP_2017 + GP_2018) * abs(`EVA/60_2017` - `EVA/60_2018`), 0) +
+        if_else(!is.na(GP_2018) & !is.na(GP_2019) & !is.na(`EVA/60_2018`) & !is.na(`EVA/60_2019`), (GP_2018 + GP_2019) * abs(`EVA/60_2018` - `EVA/60_2019`), 0) +
+        if_else(!is.na(GP_2019) & !is.na(GP_2020) & !is.na(`EVA/60_2019`) & !is.na(`EVA/60_2020`), (GP_2019 + GP_2020) * abs(`EVA/60_2019` - `EVA/60_2020`), 0) +
+        if_else(!is.na(GP_2020) & !is.na(GP_2021) & !is.na(`EVA/60_2020`) & !is.na(`EVA/60_2021`), (GP_2020 + GP_2021) * abs(`EVA/60_2020` - `EVA/60_2021`), 0) +
+        if_else(!is.na(GP_2021) & !is.na(GP_2022) & !is.na(`EVA/60_2021`) & !is.na(`EVA/60_2022`), (GP_2021 + GP_2022) * abs(`EVA/60_2021` - `EVA/60_2022`), 0) +
+        if_else(!is.na(GP_2022) & !is.na(GP_2023) & !is.na(`EVA/60_2022`) & !is.na(`EVA/60_2023`), (GP_2022 + GP_2023) * abs(`EVA/60_2022` - `EVA/60_2023`), 0)
+    ) / 
+      (
+        sum(if_else(!is.na(GP_2016) & !is.na(GP_2017), GP_2016 + GP_2017, 0), 
+            if_else(!is.na(GP_2017) & !is.na(GP_2018), GP_2017 + GP_2018, 0), 
+            if_else(!is.na(GP_2018) & !is.na(GP_2019), GP_2018 + GP_2019, 0), 
+            if_else(!is.na(GP_2019) & !is.na(GP_2020), GP_2019 + GP_2020, 0), 
+            if_else(!is.na(GP_2020) & !is.na(GP_2021), GP_2020 + GP_2021, 0), 
+            if_else(!is.na(GP_2021) & !is.na(GP_2022), GP_2021 + GP_2022, 0), 
+            if_else(!is.na(GP_2022) & !is.na(GP_2023), GP_2022 + GP_2023, 0))
+      ),
+    
+    `S%_wmc` = (
+      if_else(!is.na(GP_2016) & !is.na(GP_2017) & !is.na(`S%_2016`) & !is.na(`S%_2017`), (GP_2016 + GP_2017) * abs(`S%_2016` - `S%_2017`), 0) +
+        if_else(!is.na(GP_2017) & !is.na(GP_2018) & !is.na(`S%_2017`) & !is.na(`S%_2018`), (GP_2017 + GP_2018) * abs(`S%_2017` - `S%_2018`), 0) +
+        if_else(!is.na(GP_2018) & !is.na(GP_2019) & !is.na(`S%_2018`) & !is.na(`S%_2019`), (GP_2018 + GP_2019) * abs(`S%_2018` - `S%_2019`), 0) +
+        if_else(!is.na(GP_2019) & !is.na(GP_2020) & !is.na(`S%_2019`) & !is.na(`S%_2020`), (GP_2019 + GP_2020) * abs(`S%_2019` - `S%_2020`), 0) +
+        if_else(!is.na(GP_2020) & !is.na(GP_2021) & !is.na(`S%_2020`) & !is.na(`S%_2021`), (GP_2020 + GP_2021) * abs(`S%_2020` - `S%_2021`), 0) +
+        if_else(!is.na(GP_2021) & !is.na(GP_2022) & !is.na(`S%_2021`) & !is.na(`S%_2022`), (GP_2021 + GP_2022) * abs(`S%_2021` - `S%_2022`), 0) +
+        if_else(!is.na(GP_2022) & !is.na(GP_2023) & !is.na(`S%_2022`) & !is.na(`S%_2023`), (GP_2022 + GP_2023) * abs(`S%_2022` - `S%_2023`), 0)
+    ) / 
+      (
+        sum(if_else(!is.na(GP_2016) & !is.na(GP_2017), GP_2016 + GP_2017, 0), 
+            if_else(!is.na(GP_2017) & !is.na(GP_2018), GP_2017 + GP_2018, 0), 
+            if_else(!is.na(GP_2018) & !is.na(GP_2019), GP_2018 + GP_2019, 0), 
+            if_else(!is.na(GP_2019) & !is.na(GP_2020), GP_2019 + GP_2020, 0), 
+            if_else(!is.na(GP_2020) & !is.na(GP_2021), GP_2020 + GP_2021, 0), 
+            if_else(!is.na(GP_2021) & !is.na(GP_2022), GP_2021 + GP_2022, 0), 
+            if_else(!is.na(GP_2022) & !is.na(GP_2023), GP_2022 + GP_2023, 0))
+      )
+  )
+
+
+
+```
+
+
+
+
+```{r}
+long_forwards <- long_forwards |> 
+  group_by(Player, PlayerID) |> 
+  mutate(total_wmc = sum(normalized_loadings[1, 1] * EVA_wmc, normalized_loadings[2, 1] * EVG_wmc, normalized_loadings[3, 1] * `S%_wmc`)) |> 
+  ungroup()
+
+
+
+
+long_forwards <- long_forwards |> 
+  mutate(mean_zscore = mean_zscore_2016,
+         mean_EVG_zscore = mean_EVG_zscore_2016,
+         mean_EVA_zscore = mean_EVA_zscore_2016,
+         `mean_S%_zscore` = `mean_S%_zscore_2016`,
+         total_zscore = mean_zscore_2016,
+         med_total_zscore = median(total_zscore, na.rm = TRUE),
+         med_total_wmc = median(total_wmc, na.rm = TRUE),
+         avg_total_zscore = mean(total_zscore, na.rm = TRUE),
+         avg_total_wmc = mean(total_wmc, na.rm = TRUE),
+         med_EVG_zscore = median(mean_EVG_zscore, na.rm = TRUE),
+         med_EVG_wmc = median(EVG_wmc, na.rm = TRUE),
+         med_EVA_zscore = median(mean_EVA_zscore, na.rm = TRUE),
+         med_EVA_wmc = median(EVA_wmc, na.rm = TRUE),
+         `med_S%_zscore` = median(`mean_S%_zscore`, na.rm = TRUE),
+         `med_S%_wmc` = median(`S%_wmc`, na.rm = TRUE),
+         avg_EVG_zscore = mean(mean_EVG_zscore, na.rm = TRUE),
+         avg_EVG_wmc = mean(EVG_wmc, na.rm = TRUE),
+         avg_EVA_zscore = mean(mean_EVA_zscore, na.rm = TRUE),
+         avg_EVA_wmc = mean(EVA_wmc, na.rm = TRUE),
+         `avg_S%_zscore` = mean(`mean_S%_zscore`, na.rm = TRUE),
+         `avg_S%_wmc` = mean(`S%_wmc`, na.rm = TRUE),
+  )
+
+
+
+
+
+
+long_forwards |> 
+  ggplot(aes(total_zscore, total_wmc, label = Player)) +
+  geom_point(alpha = 0.5) +
+  geom_vline(aes(xintercept = med_total_zscore)) +
+  geom_hline(aes(yintercept = med_total_wmc)) +
+  geom_vline(aes(xintercept = avg_total_zscore), color = "red") +
+  geom_hline(aes(yintercept = avg_total_wmc), color = "red") +
+  geom_label_repel(size = 2, box.padding = 0.35) +
+  theme_light() +
+  labs(
+    x = "Combined Z-Scores of Metrics",
+    y = "Consistency",
+    caption = "Data Courtesy of Hockey-Reference"
+  )
+
+
+
+
+long_forwards |> 
+  ggplot(aes(mean_EVG_zscore, EVG_wmc, label = Player)) +
+  geom_point(alpha = 0.5) +
+  geom_vline(aes(xintercept = med_EVG_zscore)) +
+  geom_hline(aes(yintercept = med_EVG_wmc)) +
+  geom_label_repel(size = 2, box.padding = 0.25) + 
+  labs(
+    x = "Mean Z-Score of Goals per 60 at EV ",
+    y = "Consistency",
+    caption = "Data Courtsey of Hockey-Reference"
+  ) +
+  theme_light()
+
+
+
+
+long_forwards |> 
+  ggplot(aes(mean_EVA_zscore, EVA_wmc, label = Player)) +
+  geom_point(alpha = 0.5) +
+  geom_vline(aes(xintercept = med_EVA_zscore)) +
+  geom_hline(aes(yintercept = med_EVA_wmc)) +
+  geom_label_repel(size = 2, box.padding = 0.35) +
+  labs(
+    x = "Mean Z-Score of Assists per 60 at EV",
+    y = "Consistency",
+    caption = "Data Courtesy of Hockey-Reference"
+  ) +
+  theme_light()
+
+
+
+
+
+long_forwards |> 
+  ggplot(aes(`mean_S%_zscore`, `S%_wmc`, label = Player)) +
+  geom_point(alpha = 0.5) +
+  geom_vline(aes(xintercept = `med_S%_zscore`)) +
+  geom_hline(aes(yintercept = `med_S%_wmc`)) +
+  geom_label_repel(size = 2, box.padding = 0.25) +
+  theme_light() +
+  labs(
+    x = "Mean Z-Score of Shooting Percentage at EV",
+    y = "Consistency",
+    caption = "Data Courtesy of Hockey-Reference"
+  )
+```
 
 
 
