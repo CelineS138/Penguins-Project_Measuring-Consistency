@@ -16,6 +16,116 @@ library(ggthemes)
 ## Loading Data
 
 
+
+
+
+```{r}
+skaters <- complete_df |> 
+  group_by(Player, PlayerID, start_year) |> 
+  summarise(
+            Pos = Pos,
+            GP = GP,
+            `EVG/60` = (EVG / TOI) * 60,
+            `EVA/60` = (EVA / TOI) * 60,
+            `EVPTS/60` = ((EVG + EVA) / TOI) * 60,
+            `GC/60` = (GC / TOI) * 60,
+            `S%` = `S%`,
+            `EVGA/60` = ((TGA - PGA) / TOI) * 60,
+            `GA/60(EV)` = `GA/60 (EV)`,
+            `TGA/60` = (TGA / TOI) * 60,
+            `BLK/60` = (BLK / TOI) * 60,
+            `DPS/60` = (DPS / TOI) * 60,
+            `xGA/60` = (xGA / TOI) * 60,
+            `+_-/60` = (`+/-` / TOI) * 60,
+            `TK/60` = (TK / TOI) * 60,
+            `GV/60` = (GV / TOI) * 60,
+            `CF%` = `CF%`
+            )
+
+
+skaters <- skaters |> 
+  ungroup() |> 
+  group_by(start_year, Pos) |> 
+  mutate(
+    avg_EVG = mean(`EVG/60`),
+    avg_EVA = mean(`EVA/60`),
+    avg_EVPTS = mean(`EVPTS/60`),
+    avg_GC = mean(`GC/60`),
+    `avg_S%` = mean(`S%`),
+    avg_BLK = mean(`BLK/60`),
+    avg_TK = mean(`TK/60`),
+    avg_GV = mean(`GV/60`),
+    `avg_CF%` = mean(`CF%`),
+    
+    sd_EVG = sd(`EVG/60`),
+    sd_EVA = sd(`EVA/60`),
+    sd_EVPTS = sd(`EVPTS/60`),
+    sd_GC = sd(`GC/60`),
+    `sd_S%` = sd(`S%`),
+    sd_BLK = sd(`BLK/60`),
+    sd_TK = sd(`TK/60`),
+    sd_GV = sd(`GV/60`),
+    `sd_CF%` = sd(`CF%`)
+         )
+
+
+skaters <- skaters |> 
+  ungroup() |> 
+  group_by(Player, PlayerID, start_year) |> 
+  mutate(
+    EVG_zscore = (`EVG/60` - avg_EVG) / sd_EVG,
+    EVA_zscore = (`EVA/60` - avg_EVA) / sd_EVA,
+    EVPTS_zscore = (`EVPTS/60` - avg_EVPTS) / sd_EVPTS,
+    GC_zscore = (`GC/60` - avg_GC) / sd_GC,
+    `S%_zscore` = (`S%` - `avg_S%`) / `sd_S%`,
+    BLK_zscore = (`BLK/60` - avg_BLK) / sd_BLK,
+    TK_zscore = (`TK/60` - avg_TK) / sd_TK,
+    GV_zscore = (`GV/60` - avg_GV) / sd_GV,
+    `CF%_zscore` = (`CF%` - `avg_CF%`) / `sd_CF%`
+         )
+
+
+long_skaters <- skaters |> 
+  ungroup() |> 
+  pivot_wider(id_cols = c(Player, PlayerID), values_from = c(`GP`, `EVG/60`, `EVA/60`, `EVPTS/60`, `GC/60`, `S%`, `BLK/60`, `GV/60`, `TK/60`, EVG_zscore, EVA_zscore, EVPTS_zscore, GC_zscore, `S%_zscore`, BLK_zscore, TK_zscore, GV_zscore, `CF%_zscore`), names_from = start_year)
+
+
+long_forwards <- long_skaters |> 
+  left_join(player_pos) |> 
+  filter(Pos == "F")
+
+
+
+long_forwards <- long_forwards |> 
+  mutate(
+    EVG_first_4yrs = ((GP_2016 + GP_2017) * abs(`EVG/60_2016` - `EVG/60_2017`) + 
+           (GP_2017 + GP_2018) * abs(`EVG/60_2017` - `EVG/60_2018`) +
+           (GP_2018 + GP_2019) * abs(`EVG/60_2018` - `EVG/60_2019`)) / 
+           (GP_2016 + GP_2017) + (GP_2017 + GP_2018) + (GP_2018 + GP_2019),
+    
+    EVG_last_4yrs = ((GP_2020 + GP_2021) * (`EVG/60_2020` - `EVG/60_2021`) + 
+           (GP_2021 + GP_2022) * (`EVG/60_2021` - `EVG/60_2022`) +
+           (GP_2022 + GP_2023) * (`EVG/60_2022` - `EVG/60_2023`)) / 
+           (GP_2020 + GP_2021) + (GP_2021 + GP_2022) + (GP_2022 + GP_2023),
+    
+    EVA_first_4yrs = ((GP_2016 + GP_2017) * (`EVA/60_2016` - `EVA/60_2017`) + 
+           (GP_2017 + GP_2018) * (`EVA/60_2017` - `EVA/60_2018`) +
+           (GP_2018 + GP_2019) * (`EVA/60_2018` - `EVA/60_2019`)) / 
+           (GP_2016 + GP_2017) + (GP_2017 + GP_2018) + (GP_2018 + GP_2019),
+    
+    EVA_last_4yrs = ((GP_2020 + GP_2021) * (`EVA/60_2020` - `EVA/60_2021`) + 
+           (GP_2021 + GP_2022) * (`EVA/60_2021` - `EVA/60_2022`) +
+           (GP_2022 + GP_2023) * (`EVA/60_2022` - `EVA/60_2023`)) / 
+           (GP_2020 + GP_2021) + (GP_2021 + GP_2022) + (GP_2022 + GP_2023)
+    )
+
+```
+
+
+
+
+
+
 ```{r}
 long_forwards <- long_forwards |> 
   mutate(
