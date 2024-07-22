@@ -534,8 +534,8 @@ long_forwards <- long_forwards |>
 long_forwards |> 
   ggplot(aes(mean_zscore, zscore_wmc, label = Player)) +
   geom_point(alpha = 0.5) +
-  geom_vline(aes(xintercept = med_mean_zscore), linetype = "dashed", size = 1) +
-  geom_hline(aes(yintercept = med_zscore_wmc), linetype = "dashed", size = 1) +
+  geom_vline(aes(xintercept = med_mean_zscore), linetype = "dashed", size = 1, color = "#FCB514") +
+  geom_hline(aes(yintercept = med_zscore_wmc), linetype = "dashed", size = 1, color = "#FCB514") +
   geom_label_repel(size = 2, box.padding = 0.35) +
   theme_light() +
   labs(
@@ -568,8 +568,8 @@ long_forwards |>
 long_forwards |> 
   ggplot(aes(mean_EVG_zscore, EVG_wmc, label = Player)) +
   geom_point(alpha = 0.5) +
-  geom_vline(aes(xintercept = med_EVG_zscore), linetype = "dashed", size = 1) +
-  geom_hline(aes(yintercept = med_EVG_wmc), linetype = "dashed", size = 1) +
+  geom_vline(aes(xintercept = med_EVG_zscore), linetype = "dashed", size = 1, color = "#FCB514") +
+  geom_hline(aes(yintercept = med_EVG_wmc), linetype = "dashed", size = 1, color = "#FCB514") +
   geom_label_repel(size = 2, box.padding = 0.25) + 
   labs(
     x = "Mean Z-Score of Goals per 60 at EV ",
@@ -584,8 +584,8 @@ long_forwards |>
 long_forwards |> 
   ggplot(aes(mean_EVA_zscore, EVA_wmc, label = Player)) +
   geom_point(alpha = 0.5) +
-  geom_vline(aes(xintercept = med_EVA_zscore), linetype = "dashed", size = 1) +
-  geom_hline(aes(yintercept = med_EVA_wmc), linetype = "dasehd", size = 1) +
+  geom_vline(aes(xintercept = med_EVA_zscore), linetype = "dashed", size = 1, color = "#FCB514") +
+  geom_hline(aes(yintercept = med_EVA_wmc), linetype = "dasehd", size = 1, color = "#FCB514") +
   geom_label_repel(size = 2, box.padding = 0.35) +
   labs(
     x = "Mean Z-Score of Assists per 60 at EV",
@@ -601,8 +601,8 @@ long_forwards |>
 long_forwards |> 
   ggplot(aes(`mean_S%_zscore`, `S%_wmc`, label = Player)) +
   geom_point(alpha = 0.5) +
-  geom_vline(aes(xintercept = `med_S%_zscore`), linetype = "dashed", size = 1) +
-  geom_hline(aes(yintercept = `med_S%_wmc`), linetype = "dashed", size = 1) +
+  geom_vline(aes(xintercept = `med_S%_zscore`), linetype = "dashed", size = 1, color = "#FCB514") +
+  geom_hline(aes(yintercept = `med_S%_wmc`), linetype = "dashed", size = 1, color = "#FCB514") +
   geom_label_repel(size = 2, box.padding = 0.25) +
   theme_light() +
   labs(
