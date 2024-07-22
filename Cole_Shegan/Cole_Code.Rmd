@@ -361,10 +361,20 @@ forwards <- skaters |>
          `mean_S%_zscore` = mean(`S%_zscore`, na.rm = TRUE))
 
 
+forwards <- forwards |> 
+  ungroup() |> 
+  mutate(qrt1 = quantile(total_zscore, 0.25),
+         qrt2 = quantile(total_zscore, 0.5),
+         qrt3 = quantile(total_zscore, 0.75))
+
+
 
 forwards |> 
   ggplot(aes(as.factor(start_year), total_zscore, label = Player)) +
-  geom_violin() + 
+  geom_violin(fill = "lightblue") + 
+  geom_hline(aes(yintercept = qrt1)) +
+  geom_hline(aes(yintercept = qrt2)) +
+  geom_hline(aes(yintercept = qrt3)) +
   geom_label_repel(size = 2, box.padding = 0.3) +
   labs(
     x = "Season Starting Year",
@@ -453,6 +463,25 @@ long_forwards <- long_forwards |>
             if_else(!is.na(GP_2020) & !is.na(GP_2021), GP_2020 + GP_2021, 0), 
             if_else(!is.na(GP_2021) & !is.na(GP_2022), GP_2021 + GP_2022, 0), 
             if_else(!is.na(GP_2022) & !is.na(GP_2023), GP_2022 + GP_2023, 0))
+      ),
+    
+    zscore_wmc = (
+      if_else(!is.na(GP_2016) & !is.na(GP_2017) & !is.na(`total_zscore_2016`) & !is.na(`total_zscore_2017`), (GP_2016 + GP_2017) * abs(`total_zscore_2016` - `total_zscore_2017`), 0) +
+        if_else(!is.na(GP_2017) & !is.na(GP_2018) & !is.na(`total_zscore_2017`) & !is.na(`total_zscore_2018`), (GP_2017 + GP_2018) * abs(`total_zscore_2017` - `total_zscore_2018`), 0) +
+        if_else(!is.na(GP_2018) & !is.na(GP_2019) & !is.na(`total_zscore_2018`) & !is.na(`total_zscore_2019`), (GP_2018 + GP_2019) * abs(`total_zscore_2018` - `total_zscore_2019`), 0) +
+        if_else(!is.na(GP_2019) & !is.na(GP_2020) & !is.na(`total_zscore_2019`) & !is.na(`total_zscore_2020`), (GP_2019 + GP_2020) * abs(`total_zscore_2019` - `total_zscore_2020`), 0) +
+        if_else(!is.na(GP_2020) & !is.na(GP_2021) & !is.na(`total_zscore_2020`) & !is.na(`total_zscore_2021`), (GP_2020 + GP_2021) * abs(`total_zscore_2020` - `total_zscore_2021`), 0) +
+        if_else(!is.na(GP_2021) & !is.na(GP_2022) & !is.na(`total_zscore_2021`) & !is.na(`total_zscore_2022`), (GP_2021 + GP_2022) * abs(`total_zscore_2021` - `total_zscore_2022`), 0) +
+        if_else(!is.na(GP_2022) & !is.na(GP_2023) & !is.na(`total_zscore_2022`) & !is.na(`total_zscore_2023`), (GP_2022 + GP_2023) * abs(`total_zscore_2022` - `total_zscore_2023`), 0)
+    ) / 
+      (
+        sum(if_else(!is.na(GP_2016) & !is.na(GP_2017), GP_2016 + GP_2017, 0), 
+            if_else(!is.na(GP_2017) & !is.na(GP_2018), GP_2017 + GP_2018, 0), 
+            if_else(!is.na(GP_2018) & !is.na(GP_2019), GP_2018 + GP_2019, 0), 
+            if_else(!is.na(GP_2019) & !is.na(GP_2020), GP_2019 + GP_2020, 0), 
+            if_else(!is.na(GP_2020) & !is.na(GP_2021), GP_2020 + GP_2021, 0), 
+            if_else(!is.na(GP_2021) & !is.na(GP_2022), GP_2021 + GP_2022, 0), 
+            if_else(!is.na(GP_2022) & !is.na(GP_2023), GP_2022 + GP_2023, 0))
       )
   )
 
@@ -464,11 +493,10 @@ long_forwards <- long_forwards |>
 
 
 ```{r}
-long_forwards <- long_forwards |> 
-  group_by(Player, PlayerID) |> 
-  mutate(total_wmc = sum(normalized_loadings[1, 1] * EVA_wmc, normalized_loadings[2, 1] * EVG_wmc, normalized_loadings[3, 1] * `S%_wmc`)) |> 
-  ungroup()
-
+# long_forwards <- long_forwards |> 
+#   group_by(Player, PlayerID) |> 
+#   mutate(total_wmc = sum(normalized_loadings[1, 1] * EVA_wmc, normalized_loadings[2, 1] * EVG_wmc, normalized_loadings[3, 1] * `S%_wmc`)) |> 
+#   ungroup()
 
 
 
@@ -477,11 +505,15 @@ long_forwards <- long_forwards |>
          mean_EVG_zscore = mean_EVG_zscore_2016,
          mean_EVA_zscore = mean_EVA_zscore_2016,
          `mean_S%_zscore` = `mean_S%_zscore_2016`,
-         total_zscore = mean_zscore_2016,
+         
+         med_mean_zscore = median(mean_zscore, na.rm = TRUE),
+         med_zscore_wmc = median(zscore_wmc, na.rm = TRUE),
+         
          med_total_zscore = median(total_zscore, na.rm = TRUE),
          med_total_wmc = median(total_wmc, na.rm = TRUE),
          avg_total_zscore = mean(total_zscore, na.rm = TRUE),
          avg_total_wmc = mean(total_wmc, na.rm = TRUE),
+         
          med_EVG_zscore = median(mean_EVG_zscore, na.rm = TRUE),
          med_EVG_wmc = median(EVG_wmc, na.rm = TRUE),
          med_EVA_zscore = median(mean_EVA_zscore, na.rm = TRUE),
@@ -494,6 +526,22 @@ long_forwards <- long_forwards |>
          avg_EVA_wmc = mean(EVA_wmc, na.rm = TRUE),
          `avg_S%_zscore` = mean(`mean_S%_zscore`, na.rm = TRUE),
          `avg_S%_wmc` = mean(`S%_wmc`, na.rm = TRUE),
+  )
+
+
+
+
+long_forwards |> 
+  ggplot(aes(mean_zscore, zscore_wmc, label = Player)) +
+  geom_point(alpha = 0.5) +
+  geom_vline(aes(xintercept = med_mean_zscore), linetype = "dashed", size = 1.5) +
+  geom_hline(aes(yintercept = med_zscore_wmc), linetype = "dashed", size = 1.5) +
+  geom_label_repel(size = 2, box.padding = 0.35) +
+  theme_light() +
+  labs(
+    x = "Combined Z-Scores of Metrics",
+    y = "Consistency",
+    caption = "Data Courtesy of Hockey-Reference"
   )
 
 
@@ -565,6 +613,18 @@ long_forwards |>
     caption = "Data Courtesy of Hockey-Reference"
   )
 ```
+
+
+
+
+```{r}
+long_forwards |> 
+  na.omit() |> 
+  filter(total_zscore >= quantile(total_zscore, 0.85)) |> 
+  select(Player, mean_zscore, zscore_wmc) |> 
+  arrange(zscore_wmc)
+```
+
 
 
 
