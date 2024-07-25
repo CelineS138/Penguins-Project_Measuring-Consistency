@@ -700,9 +700,9 @@ set.seed(100)
 
 chosen <- sample(unique(long_forwards$Player), 200)
 
-sel_long_skaters <- subset(long_forwards, Player %in% chosen)
+sel_long_forwards <- subset(long_forwards, Player %in% chosen)
 
-sel_long_skaters <- sel_long_skaters |> 
+sel_long_forwards <- sel_long_forwards |> 
   drop_na()
 
 sel_long_forwards |> 
@@ -728,7 +728,7 @@ summary(lm(sel_long_forwards$`EVG/60_2017` ~ sel_long_forwards$`EVG/60_2016`))$r
 
 Response = c(2023, 2022, 2021, 2020, 2019, 2018, 2017)
 Explanatory = c(2022, 2021, 2020, 2019, 2018, 2017, 2016)
-r_sqr = c(0.1747068, 0.1360602, 0.1350532, 0.1463368, 0.1471732, 0.1087382, 0.09766614)
+r_sqr = c(0.1619101, 0.1289881, 0.1877242, 0.06931722, 0.2140173, 0.1789242, 0.04607436)
 
 
 EVG_rsqr_table <- data.frame(Response, Explanatory, r_sqr) |> 
@@ -751,7 +751,7 @@ summary(lm(sel_long_forwards$`EVA/60_2018` ~ sel_long_forwards$`EVA/60_2017`))$r
 summary(lm(sel_long_forwards$`EVA/60_2017` ~ sel_long_forwards$`EVA/60_2016`))$r.squared
 
 
-r_sqr2 = c(0.3072196, 0.2308246, 0.2106552, 0.2180614, 0.2375676, 0.1623963, 0.1005013)
+r_sqr2 = c(0.1667251, 0.271814, 0.2336904, 0.3530796, 0.2272132, 0.2164871, 0.09711165)
 
 
 EVA_rsqr_table <- data.frame(Response, Explanatory, r_sqr2) |> 
@@ -774,7 +774,7 @@ summary(lm(sel_long_forwards$`S%_2018` ~ sel_long_forwards$`S%_2017`))$r.squared
 summary(lm(sel_long_forwards$`S%_2017` ~ sel_long_forwards$`S%_2016`))$r.squared
 
 
-r_sqr3 = c(0.08368814, 0.1066364, 0.16239, 0.05406718, 0.09775742, 0.1035112, 0.1231119)
+r_sqr3 = c(0.1303977, 0.05933941, 0.1090481, 0.04772465, 0.08428853, 0.1108832, 0.06154308)
 
 
 shotperc_rsqr_table <- data.frame(Response, Explanatory, r_sqr3) |> 
