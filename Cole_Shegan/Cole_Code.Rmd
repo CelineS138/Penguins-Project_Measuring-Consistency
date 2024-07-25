@@ -691,13 +691,103 @@ kable(`top5_good_&_con`, caption = "Top 5 Players in Offensive Performance and C
 ```
 
 
-<!-- | Player | Mean Total Z-Score | Weighted Means Change | Salary | -->
-<!-- |--------|--------|---------|--------| -->
-<!-- | Mark Scheifele | 1.2066578	| 0.0008275089 | 8500000 | -->
-<!-- | Logan Couture	| 0.4605859 |	0.0008583732 | 8000000 | -->
-<!-- | Nikolaj Ehlers | 0.8895559 | 0.0009703751 | 6000000	| -->
-<!-- | Brett Connolly | 0.8795580 | 0.0010504570	| 3500000	| -->
-<!-- | Jonathan Huberdeau | 0.5746333 | 0.0011661490 | 10500000 | -->
+
+
+
+
+```{r}
+set.seed(100)
+
+chosen <- sample(unique(long_forwards$Player), 200)
+
+sel_long_skaters <- subset(long_forwards, Player %in% chosen)
+
+sel_long_skaters <- sel_long_skaters |> 
+  drop_na()
+
+sel_long_forwards |> 
+  ggplot(aes(`EVG/60_2023`, `EVG/60_2022`)) +
+  geom_point() +
+  geom_smooth(method = lm) +
+  geom_abline(slope = 1) +
+  theme_light() +
+  labs(
+    x = "Goals Per 60 at EV in 2023-24 Season",
+    y = "Goals Per 60 at EV in 2022-23 Season",
+    caption = "Data Courtesy of Hockey Reference",
+    title = "Metric Stickiness of Goals/60 (EV) from 2023-24 and 2022-23 Seasons"
+  )
+
+summary(lm(sel_long_forwards$`EVG/60_2023` ~ sel_long_forwards$`EVG/60_2022`))$r.squared
+summary(lm(sel_long_forwards$`EVG/60_2022` ~ sel_long_forwards$`EVG/60_2021`))$r.squared
+summary(lm(sel_long_forwards$`EVG/60_2021` ~ sel_long_forwards$`EVG/60_2020`))$r.squared
+summary(lm(sel_long_forwards$`EVG/60_2020` ~ sel_long_forwards$`EVG/60_2019`))$r.squared
+summary(lm(sel_long_forwards$`EVG/60_2019` ~ sel_long_forwards$`EVG/60_2018`))$r.squared
+summary(lm(sel_long_forwards$`EVG/60_2018` ~ sel_long_forwards$`EVG/60_2017`))$r.squared
+summary(lm(sel_long_forwards$`EVG/60_2017` ~ sel_long_forwards$`EVG/60_2016`))$r.squared
+
+Response = c(2023, 2022, 2021, 2020, 2019, 2018, 2017)
+Explanatory = c(2022, 2021, 2020, 2019, 2018, 2017, 2016)
+r_sqr = c(0.1747068, 0.1360602, 0.1350532, 0.1463368, 0.1471732, 0.1087382, 0.09766614)
+
+
+EVG_rsqr_table <- data.frame(Response, Explanatory, r_sqr) |> 
+  rename(`EVG_R^2` = r_sqr)
+
+
+
+sel_long_forwards |> 
+  ggplot(aes(`EVA/60_2023`, `EVA/60_2022`)) +
+  geom_point() +
+  geom_smooth(method = lm) +
+  geom_abline(slope = 1)
+
+summary(lm(sel_long_forwards$`EVA/60_2023` ~ sel_long_forwards$`EVA/60_2022`))$r.squared
+summary(lm(sel_long_forwards$`EVA/60_2022` ~ sel_long_forwards$`EVA/60_2021`))$r.squared
+summary(lm(sel_long_forwards$`EVA/60_2021` ~ sel_long_forwards$`EVA/60_2020`))$r.squared
+summary(lm(sel_long_forwards$`EVA/60_2020` ~ sel_long_forwards$`EVA/60_2019`))$r.squared
+summary(lm(sel_long_forwards$`EVA/60_2019` ~ sel_long_forwards$`EVA/60_2018`))$r.squared
+summary(lm(sel_long_forwards$`EVA/60_2018` ~ sel_long_forwards$`EVA/60_2017`))$r.squared
+summary(lm(sel_long_forwards$`EVA/60_2017` ~ sel_long_forwards$`EVA/60_2016`))$r.squared
+
+
+r_sqr2 = c(0.3072196, 0.2308246, 0.2106552, 0.2180614, 0.2375676, 0.1623963, 0.1005013)
+
+
+EVA_rsqr_table <- data.frame(Response, Explanatory, r_sqr2) |> 
+  rename(`EVA_R^2` = r_sqr2)
+
+
+
+sel_long_forwards |> 
+  ggplot(aes(`S%_2023`, `S%_2022`)) +
+  geom_point() +
+  geom_smooth(method = lm) +
+  geom_abline(slope = 1)
+
+summary(lm(sel_long_forwards$`S%_2023` ~ sel_long_forwards$`S%_2022`))$r.squared
+summary(lm(sel_long_forwards$`S%_2022` ~ sel_long_forwards$`S%_2021`))$r.squared
+summary(lm(sel_long_forwards$`S%_2021` ~ sel_long_forwards$`S%_2020`))$r.squared
+summary(lm(sel_long_forwards$`S%_2020` ~ sel_long_forwards$`S%_2019`))$r.squared
+summary(lm(sel_long_forwards$`S%_2019` ~ sel_long_forwards$`S%_2018`))$r.squared
+summary(lm(sel_long_forwards$`S%_2018` ~ sel_long_forwards$`S%_2017`))$r.squared
+summary(lm(sel_long_forwards$`S%_2017` ~ sel_long_forwards$`S%_2016`))$r.squared
+
+
+r_sqr3 = c(0.08368814, 0.1066364, 0.16239, 0.05406718, 0.09775742, 0.1035112, 0.1231119)
+
+
+shotperc_rsqr_table <- data.frame(Response, Explanatory, r_sqr3) |> 
+  rename(`ShotPerc_R^2` = r_sqr3)
+
+
+
+rsqr_table <- cbind(EVG_rsqr_table, EVA_rsqr_table, shotperc_rsqr_table)
+
+
+rsqr_table <- rsqr_table[ , !duplicated(colnames(rsqr_table))]
+```
+
 
 
 
