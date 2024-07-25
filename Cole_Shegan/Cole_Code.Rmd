@@ -14,6 +14,7 @@ library(ggcorrplot)
 library(dplyr)
 library(tidyr)
 library(ggthemes)
+library(knitr)
 
 library(ggbeeswarm)
 library(ggrepel)
@@ -371,7 +372,7 @@ forwards <- forwards |>
 
 forwards |> 
   ggplot(aes(as.factor(start_year), total_zscore, label = Player)) +
-  geom_violin(fill = "lightblue") + 
+  geom_violin(fill = "#FCB514") + 
   geom_hline(aes(yintercept = qrt1)) +
   geom_hline(aes(yintercept = qrt2)) +
   geom_hline(aes(yintercept = qrt3)) +
@@ -509,11 +510,6 @@ long_forwards <- long_forwards |>
          med_mean_zscore = median(mean_zscore, na.rm = TRUE),
          med_zscore_wmc = median(zscore_wmc, na.rm = TRUE),
          
-         med_total_zscore = median(total_zscore, na.rm = TRUE),
-         med_total_wmc = median(total_wmc, na.rm = TRUE),
-         avg_total_zscore = mean(total_zscore, na.rm = TRUE),
-         avg_total_wmc = mean(total_wmc, na.rm = TRUE),
-         
          med_EVG_zscore = median(mean_EVG_zscore, na.rm = TRUE),
          med_EVG_wmc = median(EVG_wmc, na.rm = TRUE),
          med_EVA_zscore = median(mean_EVA_zscore, na.rm = TRUE),
@@ -536,7 +532,7 @@ long_forwards |>
   geom_point(alpha = 0.7) +
   geom_vline(aes(xintercept = med_mean_zscore), linetype = "dashed", size = 1, color = "#FCB514") +
   geom_hline(aes(yintercept = med_zscore_wmc), linetype = "dashed", size = 1, color = "#FCB514") +
-  geom_label_repel(size = 2, box.padding = 0.35) +
+  geom_label_repel(size = 2.5, box.padding = 0.4) +
   theme_light() +
   labs(
     title = "Combined Clustering of Good vs. Bad Players \nand Consistent vs. Inconsistent Players",
@@ -571,10 +567,10 @@ long_forwards |>
   geom_point(alpha = 0.7) +
   geom_vline(aes(xintercept = med_EVG_zscore), linetype = "dashed", size = 1, color = "#FCB514") +
   geom_hline(aes(yintercept = med_EVG_wmc), linetype = "dashed", size = 1, color = "#FCB514") +
-  geom_label_repel(size = 2, box.padding = 0.25) + 
+  geom_label_repel(size = 2.5, box.padding = 0.35) + 
   labs(
     title = "EVG Clustering of Good vs. Bad Players \nand Consistent and Inconsistent Players",
-    x = "Mean Z-Score of Goals per 60 at EV ",
+    x = "Mean Z-Score of Goals per 60 at EV",
     y = "Consistency",
     caption = "Data Courtsey of Hockey-Reference"
   ) +
@@ -587,8 +583,8 @@ long_forwards |>
   ggplot(aes(mean_EVA_zscore, EVA_wmc, label = Player)) +
   geom_point(alpha = 0.7) +
   geom_vline(aes(xintercept = med_EVA_zscore), linetype = "dashed", size = 1, color = "#FCB514") +
-  geom_hline(aes(yintercept = med_EVA_wmc), linetype = "dasehd", size = 1, color = "#FCB514") +
-  geom_label_repel(size = 2, box.padding = 0.35) +
+  geom_hline(aes(yintercept = med_EVA_wmc), linetype = "dashed", size = 1, color = "#FCB514") +
+  geom_label_repel(size = 2.5, box.padding = 0.4) +
   labs(
     title = "EVA Clustering of Good vs. Bad Players \nand Consistent and Inconsistent Players",
     x = "Mean Z-Score of Assists per 60 at EV",
@@ -606,7 +602,7 @@ long_forwards |>
   geom_point(alpha = 0.7) +
   geom_vline(aes(xintercept = `med_S%_zscore`), linetype = "dashed", size = 1, color = "#FCB514") +
   geom_hline(aes(yintercept = `med_S%_wmc`), linetype = "dashed", size = 1, color = "#FCB514") +
-  geom_label_repel(size = 2, box.padding = 0.25) +
+  geom_label_repel(size = 2.5, box.padding = 0.4) +
   labs(
     title = "S% Clustering of Good vs. Bad Players \nand Consistent and Inconsistent Players",
     x = "Mean Z-Score of Shooting Percentage at EV",
@@ -620,14 +616,90 @@ long_forwards |>
 
 
 ```{r}
-long_forwards |> 
-  na.omit() |> 
-  filter(total_zscore >= quantile(total_zscore, 0.85)) |> 
-  select(Player, mean_zscore, zscore_wmc) |> 
+contracts <- read_csv("~/CMU Summer Research/Capstone Project/Data_Copy/NHL_contracts.csv") |> 
+  select(Player, Cap, Term)
+
+players <- complete_df |> 
+  select(Player, PlayerID)
+
+contracts <- players |> 
+  group_by(Player, PlayerID) |> 
+  right_join(contracts) |> 
+  ungroup() |> 
+  unique()
+
+long_forwards <- long_forwards |> 
+  left_join(contracts)
+
+`top5_good_&_con` <- long_forwards |> 
+  # na.omit() |> 
+  filter(mean_zscore >= quantile(mean_zscore, 0.80, na.rm = TRUE)) |> 
+  select(Player, mean_zscore, zscore_wmc, Cap) |> 
+  rename(Mean_Total_zscore = mean_zscore, 
+         Weighted_Means_Change = zscore_wmc,
+         Salary = Cap) |> 
+  arrange(Weighted_Means_Change) |> 
+  head(5)
+
+`bottom5_good_&_incon` <- long_forwards |> 
+  # na.omit() |> 
+  filter(mean_zscore >= quantile(mean_zscore, 0.80, na.rm = TRUE)) |> 
+  select(Player, mean_zscore, zscore_wmc, Cap) |> 
   rename(Mean_Total_zscore = mean_zscore, 
          Weighted_Means_Change = zscore_wmc) |> 
-  arrange(Weighted_Means_Change)
+  arrange(desc(Weighted_Means_Change)) |> 
+  head(5)
+
+
+long_forwards |> 
+  ggplot(aes(Cap, mean_zscore)) +
+  geom_point() +
+  geom_smooth(method = lm)
+
+long_forwards |> 
+  ggplot(aes(Cap, zscore_wmc)) +
+  geom_point() +
+  geom_smooth(method = lm)
+
+long_forwards |> 
+  na.omit()
+
+cap_zscore <- summary(lm(long_forwards$mean_zscore ~ long_forwards$Cap))$r.squared
+
+cap_wmc_r2 <- summary(lm(long_forwards$zscore_wmc ~ long_forwards$Cap))$r.squared
+
+cap_cor_table <- data.frame(cap_wmc_r2, cap_zscore, row.names = "Adjusted R Squared") |> 
+  rename(Cap_WMC = cap_wmc_r2,
+         Cap_Zscore = cap_zscore)
+
+cap_cor_table <- t(cap_cor_table) |> 
+  data.frame()
+
+cap_cor_table <- cap_cor_table |> 
+  mutate(Variable1 = "Cap Hit") |> 
+  mutate(Variable2 = "V")
+
+cap_cor_table[1, 3] = "Consistency"
+cap_cor_table[2, 3] = "Performance"
+
+
+cap_cor_table
+
+kable(cap_cor_table, caption = "Correlation Table Between Salary and Consistency & Salary and Performance")
+
+kable(`top5_good_&_con`, caption = "Top 5 Players in Offensive Performance and Consistency")
 ```
+
+
+<!-- | Player | Mean Total Z-Score | Weighted Means Change | Salary | -->
+<!-- |--------|--------|---------|--------| -->
+<!-- | Mark Scheifele | 1.2066578	| 0.0008275089 | 8500000 | -->
+<!-- | Logan Couture	| 0.4605859 |	0.0008583732 | 8000000 | -->
+<!-- | Nikolaj Ehlers | 0.8895559 | 0.0009703751 | 6000000	| -->
+<!-- | Brett Connolly | 0.8795580 | 0.0010504570	| 3500000	| -->
+<!-- | Jonathan Huberdeau | 0.5746333 | 0.0011661490 | 10500000 | -->
+
+
 
 
 
